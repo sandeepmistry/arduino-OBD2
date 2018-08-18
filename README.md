@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/sandeepmistry/arduino-OBD2.svg?branch=master)](https://travis-ci.org/sandeepmistry/arduino-OBD2)
 
-An Arduino library for reading OBD-II data from your car over CAN bus. Depends the [CAN](https://github.com/sandeepmistry/arduino-CAN) library.
+An Arduino library for reading OBD-II data from your car over CAN bus. Depends on the [CAN](https://github.com/sandeepmistry/arduino-CAN) library.
 
 ## Compatible Hardware
 
