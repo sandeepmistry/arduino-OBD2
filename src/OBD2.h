@@ -107,6 +107,8 @@ enum {
   // more PIDs can be added from: https://en.wikipedia.org/wiki/OBD-II_PIDs
 };
 
+// default timeout for a response in milliseconds
+#define OBD2_DEFAULT_TIMEOUT 2000
 
 class OBD2Class {
 public:
@@ -127,12 +129,15 @@ public:
   String vinRead();
   String ecuNameRead();
 
+  void setTimeout(unsigned long timeout);
+
 private:
   int supportedPidsRead();
 
   int pidRead(uint8_t mode, uint8_t pid, void* data, int length);
 
 private:
+  unsigned long _responseTimeout;
   bool _useExtendedAddressing;
   unsigned long _lastPidResponseMillis;
   uint32_t _supportedPids[32];

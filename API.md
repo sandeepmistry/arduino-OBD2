@@ -201,3 +201,13 @@ String vin = OBD2.ecuNameRead();
 ```
 
 Returns vehicle's ECU name, or empty string on failure.
+
+### Response timeout
+
+Set the response timeout in milliseconds.
+
+```
+OBD2.setTimeout(timeout);
+```
+
+ * `timeout` - new response in milliseconds. Defaults to 2000 if not set.

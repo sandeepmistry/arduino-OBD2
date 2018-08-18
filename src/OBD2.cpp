@@ -327,6 +327,7 @@ const char* const PID_UNIT_MAPPER[] PROGMEM = {
 };
 
 OBD2Class::OBD2Class() :
+  _responseTimeout(OBD2_DEFAULT_TIMEOUT),
   _lastPidResponseMillis(0)
 {
   memset(_supportedPids, 0x00, sizeof(_supportedPids));
@@ -665,6 +666,11 @@ String OBD2Class::ecuNameRead()
   return ecuName;
 }
 
+void OBD2Class::setTimeout(unsigned long timeout)
+{
+  _responseTimeout = timeout;
+}
+
 int OBD2Class::supportedPidsRead()
 {
   for (int pid = 0x00; pid < 0xe0; pid += 0x20) {
@@ -716,7 +722,7 @@ int OBD2Class::pidRead(uint8_t mode, uint8_t pid, void* data, int length)
 
   bool splitResponse = (length > 5);
 
-  for (unsigned long start = millis(); (millis() - start) < 2000;) {
+  for (unsigned long start = millis(); (millis() - start) < _responseTimeout;) {
     if (CAN.parsePacket() != 0 &&
           (splitResponse ? (CAN.read() == 0x10 && CAN.read()) : CAN.read()) &&
           (CAN.read() == (mode | 0x40) && CAN.read() == pid)) {
