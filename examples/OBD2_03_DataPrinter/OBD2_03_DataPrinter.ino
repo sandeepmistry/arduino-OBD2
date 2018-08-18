@@ -48,16 +48,18 @@ void processPid(int pid) {
     return;
   }
 
-  // read the pin value
+  // print PID name
   Serial.print(OBD2.pidName(pid));
   Serial.print(F(" = "));
 
   if (OBD2.pidValueRaw(pid)) {
+    // read the raw PID value
     unsigned long pidRawValue = OBD2.pidReadRaw(pid);
 
     Serial.print(F("0x"));
     Serial.print(pidRawValue, HEX);
   } else {
+    // read the PID value
     float pidValue = OBD2.pidRead(pid);
 
     if (isnan(pidValue)) {
