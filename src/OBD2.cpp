@@ -326,7 +326,8 @@ const char* const PID_UNIT_MAPPER[] PROGMEM = {
   NULL,
 };
 
-OBD2Class::OBD2Class()
+OBD2Class::OBD2Class() :
+  _lastPidResponseMillis(0)
 {
   memset(_supportedPids, 0x00, sizeof(_supportedPids));
 }
@@ -690,6 +691,12 @@ int OBD2Class::supportedPidsRead()
 
 int OBD2Class::pidRead(uint8_t mode, uint8_t pid, void* data, int length)
 {
+  // make sure at least 60 ms have passed since the last response
+  unsigned long lastResponseDelta = millis() - _lastPidResponseMillis;
+  if (lastResponseDelta < 60) {
+    delay(60 - lastResponseDelta);
+  }
+
   for (int retries = 10; retries > 0; retries--) {
     if (_useExtendedAddressing) {
       CAN.beginExtendedPacket(0x18db33f1, 8);
@@ -714,6 +721,8 @@ int OBD2Class::pidRead(uint8_t mode, uint8_t pid, void* data, int length)
           (splitResponse ? (CAN.read() == 0x10 && CAN.read()) : CAN.read()) &&
           (CAN.read() == (mode | 0x40) && CAN.read() == pid)) {
 
+      _lastPidResponseMillis = millis();
+
       // got a response
       if (!splitResponse) {
         return CAN.readBytes((uint8_t*)data, length);
@@ -722,6 +731,8 @@ int OBD2Class::pidRead(uint8_t mode, uint8_t pid, void* data, int length)
       int read = CAN.readBytes((uint8_t*)data, 3);
 
       for (int i = 0; read < length; i++) {
+        delay(60);
+
         // send the request for the next chunk
         if (_useExtendedAddressing) {
           CAN.beginExtendedPacket(0x18db33f1, 8);
@@ -739,6 +750,8 @@ int OBD2Class::pidRead(uint8_t mode, uint8_t pid, void* data, int length)
           ((uint8_t*)data)[read++] = CAN.read();
         }
       }
+
+      _lastPidResponseMillis = millis();
 
       return read;
     }

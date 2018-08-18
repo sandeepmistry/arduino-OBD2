@@ -134,6 +134,7 @@ private:
 
 private:
   bool _useExtendedAddressing;
+  unsigned long _lastPidResponseMillis;
   uint32_t _supportedPids[32];
 };
 
