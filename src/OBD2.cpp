@@ -722,7 +722,7 @@ int OBD2Class::clearAllStoredDTC() {
         }
     }
 
-    return 0;
+    return 1;
 }
 
 int OBD2Class::pidRead(uint8_t mode, uint8_t pid, void* data, int length)
