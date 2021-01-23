@@ -715,8 +715,7 @@ int OBD2Class::clearAllStoredDTC() {
         if (CAN.endPacket()) {
             // send success
             break;
-        }
-        else if (retries <= 1) {
+} else if (retries <= 1) {
             return 0;
         }
     }
