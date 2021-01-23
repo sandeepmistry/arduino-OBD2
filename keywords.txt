@@ -24,6 +24,7 @@ pidReadRaw	KEYWORD2
 vinRead	KEYWORD2
 ecuNameRead	KEYWORD2
 setTimeout	KEYWORD2
+clearAllStoredDTC   KEYWORD2
 
 #######################################
 # Constants (LITERAL1)

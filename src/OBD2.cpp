@@ -695,6 +695,35 @@ int OBD2Class::supportedPidsRead()
   return 1;
 }
 
+int OBD2Class::clearAllStoredDTC()
+{
+    //Function clears stored Diagnostic Trouble Codes (DTC)
+
+    // make sure at least 60 ms have passed since the last response
+    unsigned long lastResponseDelta = millis() - _lastPidResponseMillis;
+    if (lastResponseDelta < 60) {
+        delay(60 - lastResponseDelta);
+    }
+
+    for (int retries = 10; retries > 0; retries--) {
+        if (_useExtendedAddressing) {
+            CAN.beginExtendedPacket(0x18db33f1, 8);
+        } else {
+            CAN.beginPacket(0x7df, 8);
+        }
+        CAN.write(0x00); // number of additional bytes
+        CAN.write(0x04); // Mode / Service 4, for clearing DTC
+        if (CAN.endPacket()) {
+            // send success
+            break;
+        } else if (retries <= 1) {
+            return 0;
+        }
+    }
+
+    return 1;
+}
+
 int OBD2Class::pidRead(uint8_t mode, uint8_t pid, void* data, int length)
 {
   // make sure at least 60 ms have passed since the last response
