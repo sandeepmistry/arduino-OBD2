@@ -695,7 +695,8 @@ int OBD2Class::supportedPidsRead()
   return 1;
 }
 
-int OBD2Class::clearAllStoredDTC() {
+int OBD2Class::clearAllStoredDTC()
+{
     //Function clears stored Diagnostic Trouble Codes (DTC)
 
     // make sure at least 60 ms have passed since the last response
