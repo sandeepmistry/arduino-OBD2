@@ -707,8 +707,7 @@ int OBD2Class::clearAllStoredDTC() {
     for (int retries = 10; retries > 0; retries--) {
         if (_useExtendedAddressing) {
             CAN.beginExtendedPacket(0x18db33f1, 8);
-        }
-        else {
+} else {
             CAN.beginPacket(0x7df, 8);
         }
         CAN.write(0x00); // number of additional bytes
