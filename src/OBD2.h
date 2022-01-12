@@ -133,6 +133,8 @@ public:
 
   int clearAllStoredDTC();
 
+  bool ready();
+
 private:
   int supportedPidsRead();
 

@@ -795,4 +795,16 @@ int OBD2Class::pidRead(uint8_t mode, uint8_t pid, void* data, int length)
   return 0;
 }
 
+bool OBD2Class::ready()
+{
+  // make sure at least 60 ms have passed since the last response
+  unsigned long lastResponseDelta = millis() - _lastPidResponseMillis;
+
+  if (lastResponseDelta < 60) {
+    return false;
+  }
+
+  return true;
+}
+
 OBD2Class OBD2;
