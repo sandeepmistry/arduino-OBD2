@@ -3,6 +3,7 @@
 
 #ifndef OBD2_H
 #define OBD2_H
+#define CAN_ID 0x7E0
 
 enum {
   PIDS_SUPPORT_01_20                                = 0x00,
