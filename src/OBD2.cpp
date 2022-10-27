@@ -709,7 +709,7 @@ int OBD2Class::clearAllStoredDTC()
         if (_useExtendedAddressing) {
             CAN.beginExtendedPacket(0x18db33f1, 8);
         } else {
-            CAN.beginPacket(0x7e0, 8);
+            CAN.beginPacket(CAN_ID, 8);
         }
         CAN.write(0x00); // number of additional bytes
         CAN.write(0x04); // Mode / Service 4, for clearing DTC
@@ -736,7 +736,7 @@ int OBD2Class::pidRead(uint8_t mode, uint8_t pid, void* data, int length)
     if (_useExtendedAddressing) {
       CAN.beginExtendedPacket(0x18db33f1, 8);
     } else {
-      CAN.beginPacket(0x7e0, 8);
+      CAN.beginPacket(CAN_ID, 8);
     }
     CAN.write(0x02); // number of additional bytes
     CAN.write(mode);
@@ -772,7 +772,7 @@ int OBD2Class::pidRead(uint8_t mode, uint8_t pid, void* data, int length)
         if (_useExtendedAddressing) {
           CAN.beginExtendedPacket(0x18db33f1, 8);
         } else {
-          CAN.beginPacket(0x7e0, 8);
+          CAN.beginPacket(CAN_ID, 8);
         }
         CAN.write(0x30);
         CAN.endPacket();
