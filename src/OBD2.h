@@ -133,6 +133,9 @@ public:
 
   int clearAllStoredDTC();
 
+  int pidReadCustom(uint8_t mode, uint8_t pid, void* data, int length);
+  void getDTC(void* data,int length);
+
 private:
   int supportedPidsRead();
 
