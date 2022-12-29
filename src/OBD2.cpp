@@ -795,4 +795,79 @@ int OBD2Class::pidRead(uint8_t mode, uint8_t pid, void* data, int length)
   return 0;
 }
 
+int OBD2Class::pidReadCustom(uint8_t mode, uint8_t pid, void* data, int length)
+{
+  // make sure at least 60 ms have passed since the last response
+  unsigned long lastResponseDelta = millis() - _lastPidResponseMillis;
+  if (lastResponseDelta < 60) {
+    delay(60 - lastResponseDelta);
+  }
+
+  for (int retries = 10; retries > 0; retries--) {
+    if (_useExtendedAddressing) {
+      CAN.beginExtendedPacket(0x18db33f1, 8);
+    } else {
+      CAN.beginPacket(0x7df, 8);
+    }
+    CAN.write(0x02); // number of additional bytes
+    CAN.write(mode);
+    CAN.write(pid);
+    if (CAN.endPacket()) {
+      // send success
+      break;
+    } else if (retries <= 1) {
+      return 0;
+    }
+  }
+
+  bool splitResponse = (length > 5);
+
+  for (unsigned long start = millis(); (millis() - start) < _responseTimeout;) {
+    if (CAN.parsePacket() != 0 &&
+          (splitResponse ? (CAN.read() == 0x10 && CAN.read()) : CAN.read()) &&
+          (CAN.read() == (mode | 0x40) && CAN.read() == pid)) {
+
+      _lastPidResponseMillis = millis();
+
+      // got a response
+      if (!splitResponse) {
+        return CAN.readBytes((uint8_t*)data, length);
+      }
+
+      int read = CAN.readBytes((uint8_t*)data, 3);
+
+      for (int i = 0; read < length; i++) {
+        delay(60);
+
+        // send the request for the next chunk
+        if (_useExtendedAddressing) {
+          CAN.beginExtendedPacket(0x18db33f1, 8);
+        } else {
+          CAN.beginPacket(0x7df, 8);
+        }
+        CAN.write(0x30);
+        CAN.endPacket();
+
+        // wait for response
+        while (CAN.parsePacket() == 0 ||
+               CAN.read() != (0x21 + i)); // correct sequence number
+
+        while (CAN.available()) {
+          ((uint8_t*)data)[read++] = CAN.read();
+        }
+      }
+
+      _lastPidResponseMillis = millis();
+
+      return read;
+    }
+  }
+
+  return 0;
+}
+
+OBD2Class::getDTC(void* data,int length){
+  pidReadCustom(0x03,0x01,data,length);
+}
+
 OBD2Class OBD2;
